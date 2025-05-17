@@ -19,15 +19,15 @@ services:
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=test-db
 
-  # test-runner:
-  #   build:
-  #     context: ../
-  #     dockerfile: docker/Dockerfile
-  #   container_name: test-runner
-  #   restart: always
-  #   env_file:
-  #     - ../local.env
-  #   depends_on:
-  #     test-db:
-  #       condition: service_started
-  #   command: npm run test
+  test-runner:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    container_name: test-runner
+    restart: always
+    env_file:
+      - ../.env.local
+    depends_on:
+      test-db:
+        condition: service_started
+    command: pnpm test

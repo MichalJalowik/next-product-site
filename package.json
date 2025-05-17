@@ -10,6 +10,7 @@
     "format": "prettier . --write",
     "preinstall": "only-allow pnpm",
     "test": "prisma generate && pnpm sync-db && jest",
+    "test-ci": "cd docker && docker compose run test-runner",
     "dev-db": "cd docker && docker compose up db -d --build --force-recreate",
     "sync-db": "prisma db push --accept-data-loss --force-reset",
     "seed": "node prisma/seed.js",
