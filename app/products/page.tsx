@@ -3,18 +3,27 @@ import largeData from '@/src/mock/large/products.json';
 import smallData from '@/src/mock/small/products.json';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { getProducts } from '../api/products/service';
 
 const PAGE_SIZE = 20;
 
 export default function Products() {
   const [currentPage, setCurrentPage] = useState(1);
-  const [productDataw, setProductDataw] = useState([]);
-  const data = [...largeData, ...smallData];
+  const [productData, setProductData] = useState<Awaited<ReturnType<typeof getProducts>>>({
+    products: [],
+    totalRecords: 0,
+    totalPages: 0,
+    currentPage: 0,
+    pageSize: 0,
+  });
   const isStorybook = process.env.STORYBOOK === 'true';
+
   const startIndex = (currentPage - 1) * PAGE_SIZE;
   const endIndex = startIndex + PAGE_SIZE;
-  const productData = data.slice(startIndex, endIndex);
-  const totalPages = Math.ceil(data.length / PAGE_SIZE);
+
+  const mockData = [...largeData, ...smallData];
+  const mockProductData = mockData.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(mockData.length / PAGE_SIZE);
 
   const nextPage = () => {
     setCurrentPage(currentPage + 1);
@@ -32,7 +41,7 @@ export default function Products() {
           throw new Error('Failed to fetch products');
         }
         const data = await response.json();
-        setProductDataw(data.products.products);
+        setProductData(data);
       } catch (error) {
         console.error(error);
       }
@@ -49,7 +58,7 @@ export default function Products() {
       </a>
       <div className='z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex'>
         <div className='grid lg:max-w-5xl lg:w-full lg:grid-cols-2 lg:text-left'>
-          {(isStorybook ? productData : (productDataw as any)).map((product: any) => (
+          {(isStorybook ? mockProductData : productData.products).map((product) => (
             <div
               key={product.id}
               className='group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30'
@@ -73,9 +82,9 @@ export default function Products() {
           Previous
         </button>
         <span>
-          Page {currentPage} of {totalPages}
+          Page {currentPage} of {isStorybook ? totalPages : productData.totalPages}
         </span>
-        <button onClick={nextPage} disabled={currentPage === totalPages}>
+        <button onClick={nextPage} disabled={currentPage === (isStorybook ? totalPages : productData.totalPages)}>
           Next
         </button>
       </div>

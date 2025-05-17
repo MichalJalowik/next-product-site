@@ -6,8 +6,8 @@ export async function GET(request: Request) {
   const page = parseInt(searchParams.get('page') || '1', 10);
   const pageSize = parseInt(searchParams.get('pageSize') || '10', 10);
 
-  const productsOPaginated = await getProducts(page, pageSize);
-  return NextResponse.json({ products: productsOPaginated });
+  const products = await getProducts(page, pageSize);
+  return NextResponse.json(products);
 }
 
 export async function POST(request: Request) {

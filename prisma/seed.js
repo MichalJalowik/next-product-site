@@ -7,16 +7,27 @@ const smallData = JSON.parse(readFileSync('./src/mock/small/products.json', 'utf
 const products = [...largeData, ...smallData];
 
 async function main() {
+  console.log(`🌱 Start clearing existing data ...`);
+  await prisma.product.deleteMany();
+
   console.log(`🌱 Start seeding ...`);
+
+  const uniqueCategories = new Set();
+  let seedCount = 0;
+
   for (const product of products) {
+    uniqueCategories.add(product.category);
+
     await prisma.product.create({
       data: {
         ...product,
         category: product.category,
       },
     });
+    seedCount++;
   }
-  console.log(`🌱 Seeding finished.`);
+  console.log(`🌱 Seeding finished. Total seeds added: ${seedCount}`);
+  console.log(`🌱 Unique Categories:`, Array.from(uniqueCategories));
 }
 
 main()
