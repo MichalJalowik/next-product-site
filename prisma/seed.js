@@ -27,7 +27,6 @@ async function main() {
     seedCount++;
   }
   console.log(`🌱 Seeding finished. Total seeds added: ${seedCount}`);
-  console.log(`🌱 Unique Categories:`, Array.from(uniqueCategories));
 }
 
 main()
