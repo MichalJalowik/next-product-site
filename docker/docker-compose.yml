@@ -26,7 +26,7 @@ services:
     container_name: test-runner
     restart: always
     env_file:
-      - ../.env.local
+      - ../.env.ci
     depends_on:
       test-db:
         condition: service_started
