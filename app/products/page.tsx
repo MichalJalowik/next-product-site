@@ -1,9 +1,8 @@
 'use client';
-import largeData from '@/src/mock/large/products.json';
-import smallData from '@/src/mock/small/products.json';
+
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { getProducts } from '../api/products/service';
+import { ProductCard } from '@/src/components/productCard/productCard';
 
 const PAGE_SIZE = 20;
 
@@ -16,14 +15,6 @@ export default function Products() {
     currentPage: 0,
     pageSize: 0,
   });
-  const isStorybook = process.env.STORYBOOK === 'true';
-
-  const startIndex = (currentPage - 1) * PAGE_SIZE;
-  const endIndex = startIndex + PAGE_SIZE;
-
-  const mockData = [...largeData, ...smallData];
-  const mockProductData = mockData.slice(startIndex, endIndex);
-  const totalPages = Math.ceil(mockData.length / PAGE_SIZE);
 
   const nextPage = () => {
     setCurrentPage(currentPage + 1);
@@ -35,6 +26,7 @@ export default function Products() {
 
   useEffect(() => {
     const fetchProducts = async () => {
+      // using fetch in useEffect for simplicity, although in a real app you might want to use a more robust solution like SWR or React Query
       try {
         const response = await fetch(`api/products?page=${currentPage}&pageSize=${PAGE_SIZE}`);
         if (!response.ok) {
@@ -58,21 +50,8 @@ export default function Products() {
       </a>
       <div className='z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex'>
         <div className='grid lg:max-w-5xl lg:w-full lg:grid-cols-2 lg:text-left'>
-          {(isStorybook ? mockProductData : productData.products).map((product) => (
-            <div
-              key={product.id}
-              className='group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30'
-            >
-              <Link href={`/products/${product.id}`}>
-                <h3 className={`mb-3 text-2xl font-semibold`}>{product.name}</h3>
-                <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>Price: {product.price}</p>
-                <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>Description: {product.description}</p>
-                <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>Category: {product.category}</p>
-                <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>Rating: {product.rating}</p>
-                <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>Reviews: {product.numReviews}</p>
-                <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>Stock: {product.countInStock}</p>
-              </Link>
-            </div>
+          {productData.products.map((product) => (
+            <ProductCard key={product.id} product={product} />
           ))}
         </div>
       </div>
@@ -82,9 +61,9 @@ export default function Products() {
           Previous
         </button>
         <span>
-          Page {currentPage} of {isStorybook ? totalPages : productData.totalPages}
+          Page {currentPage} of {productData.totalPages}
         </span>
-        <button onClick={nextPage} disabled={currentPage === (isStorybook ? totalPages : productData.totalPages)}>
+        <button onClick={nextPage} disabled={currentPage === productData.totalPages}>
           Next
         </button>
       </div>
